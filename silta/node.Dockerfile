@@ -1,6 +1,5 @@
-FROM node:12.16-alpine
+FROM wunderio/silta-node:v0.1
 
 COPY . /app
-WORKDIR /app
 
 CMD npm run start
