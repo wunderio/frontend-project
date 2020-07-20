@@ -1,9 +1,46 @@
 {
+  "author": "Wunder.io",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'No build command specified in package.json'",
+    "start": "node index",
+    "lint": "npm-run-all lint:*",
+    "lint:es": "./node_modules/.bin/eslint ./",
+    "lint:style": "./node_modules/.bin/stylelint ./"
+  },
   "dependencies": {
     "express": "^4.17.1"
   },
-  "scripts": {
-    "build": "echo 'No build command specified in package.json'",
-    "start": "node index"
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-import": "^2.21.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.4",
+    "eslint-plugin-sonarjs": "^0.5.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.9",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.5",
+    "stylelint": "^13.6.0",
+    "stylelint-config-recommended": "^3.0.0"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,scss,less}": "npm-run-all lint:* --"
   }
 }

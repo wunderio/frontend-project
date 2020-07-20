@@ -1,0 +1,11 @@
+node_modules/
+
+# Next.js
+.next
+public/
+
+# MacOS
+.DS_Store
+
+# PHP Storm temp files
+.idea
