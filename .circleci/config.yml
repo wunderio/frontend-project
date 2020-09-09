@@ -4,7 +4,7 @@ orbs:
   silta: silta/silta@0.1
 
 jobs:
-  build_and_test:
+  build-and-test:
     docker:
       - image: circleci/node:12.16.2-browsers
 
@@ -13,6 +13,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm ci
+      - run:
+          name: Install pm2
+          command: npm install -D pm2
       - run:
           name: ESLint
           command: npm run lint:es
