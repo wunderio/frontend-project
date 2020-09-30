@@ -3,10 +3,37 @@ version: 2.1
 orbs:
   silta: silta/silta@0.1
 
+jobs:
+  build-and-test:
+    docker:
+      - image: circleci/node:12.16.2-browsers
+
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - run:
+          name: Install pm2
+          command: npm install -D pm2
+      - run:
+          name: ESLint
+          command: npm run lint:es
+      - run:
+          name: Stylelint
+          command: npm run lint:style
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Start the application
+          command: node_modules/pm2/bin/pm2 start ecosystem.config.js --env test
+
 workflows:
   version: 2
   commit:
     jobs:
+      - build-and-test
       - silta/frontend-build-deploy: &build-deploy
           name: Silta build & deploy
           context: silta_dev
