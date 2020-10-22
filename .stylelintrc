@@ -2,5 +2,5 @@
   "extends": [
     "stylelint-config-recommended"
   ],
-  "ignoreFiles": ["**/*.json", "**/*.png", "**/*.svg", "**/*.eot", "**/*.ttf", "**/*.woff", "**/*.woff2", "silta/*"]
+  "ignoreFiles": ["**/*.json", "**/*.ico", "**/*.png", "**/*.svg", "**/*.eot", "**/*.ttf", "**/*.woff", "**/*.woff2", "silta/*"]
 }
