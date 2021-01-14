@@ -14,9 +14,6 @@ jobs:
           name: Install Dependencies
           command: npm ci
       - run:
-          name: Install pm2
-          command: npm install -D pm2
-      - run:
           name: ESLint
           command: npm run lint:es
       - run:
@@ -27,7 +24,7 @@ jobs:
           command: npm run build
       - run:
           name: Start the application
-          command: node_modules/pm2/bin/pm2 start ecosystem.config.js --env test
+          command: npm run test
 
 workflows:
   version: 2
