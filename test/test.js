@@ -1,8 +1,8 @@
 const request = require('supertest')
-const app = require('../index.js')
+const app = require('../index')
 
-describe('GET /', function() {
-  it('respond with hello Silta', function(done) {
+describe('GET /', () => {
+  it('respond with hello Silta', (done) => {
     request(app).get('/').expect('Hello Silta!', done)
   })
 })

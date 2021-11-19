@@ -1,6 +1,6 @@
 {
-  "parser": "babel-eslint",
-  "extends": ["airbnb", "prettier", "prettier/react", "plugin:sonarjs/recommended"],
+  "parser": "@babel/eslint-parser",
+  "extends": ["airbnb/base", "prettier", "plugin:prettier/recommended", "plugin:sonarjs/recommended"],
   "plugins": ["prettier", "react", "jsx-a11y", "react-hooks", "sonarjs"],
   "env": {
     "jest": true,
@@ -20,7 +20,8 @@
     "ecmaFeatures": {
       "jsx": true,
       "modules": true
-    }
+    },
+    "requireConfigFile": false
   },
   "rules": {
     "arrow-body-style": ["error", "as-needed"],
