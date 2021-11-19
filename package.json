@@ -10,9 +10,9 @@
     "prepare": "husky install",
     "build": "echo 'No build command specified in package.json'",
     "start": "node index",
-    "lint": "npm-run-all lint:*",
+    "lint": "npm run lint:es && npm run lint:style",
     "lint:es": "./node_modules/.bin/eslint ./",
-    "lint:style": "./node_modules/.bin/stylelint ./**/*.{css,scss,js}",
+    "lint:style": "./node_modules/.bin/stylelint ./**/*.{js,ts,css,scss,less}",
     "test": "jest --forceExit"
   },
   "dependencies": {
@@ -35,7 +35,6 @@
     "husky": "^7.0.4",
     "jest": "^27.3.1",
     "lint-staged": "^12.0.3",
-    "npm-run-all": "^4.1.5",
     "postcss-scss": "^4.0.2",
     "prettier": "^2.4.1",
     "stylelint": "^14.1.0",
