@@ -2,5 +2,20 @@
   "extends": [
     "stylelint-config-recommended"
   ],
-  "ignoreFiles": ["**/*.json", "**/*.ico", "**/*.png", "**/*.svg", "**/*.eot", "**/*.ttf", "**/*.woff", "**/*.woff2", "silta/*"]
+  "overrides": [
+    {
+      "files": ["**/*.scss"],
+      "customSyntax": "postcss-scss",
+      "rules": {
+        "at-rule-no-unknown": null
+      }
+    },
+    {
+      "files": ["**/*.{js,ts}"],
+      "customSyntax": "@stylelint/postcss-css-in-js",
+      "rules": {
+        "at-rule-no-unknown": null
+      }
+    }
+  ]
 }
