@@ -3,6 +3,9 @@
   "author": "Wunder.io",
   "private": true,
   "version": "1.0.0",
+  "engines": {
+    "node": ">=16.12"
+  },
   "scripts": {
     "prepare": "husky install",
     "build": "echo 'No build command specified in package.json'",
