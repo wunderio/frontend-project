@@ -16,8 +16,7 @@
     "test": "jest --forceExit"
   },
   "dependencies": {
-    "express": "^4.17.3",
-    "minimist": "^1.2.6"
+    "express": "^4.17.3"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.17.0",
