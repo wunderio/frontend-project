@@ -27,5 +27,6 @@ nvm use $($Get-Content .nvmrc)
 ### On Windows
 
 - Linting probably wont work directly with command `npm run lint` do it via lint-staged with command `npx lint-staged`.
-Dont worry per-commit hooks will work fine.
+  Dont worry per-commit hooks will work fine.
 - In your code editor use LF all the time, otherwise there will be prettier errors when linting.
+- If having LF in your editor is not enough, try this command "git config --global core.autocrlf false".More info here https://stackoverflow.com/questions/25724969/sourcetree-line-ending-issue
