@@ -3,41 +3,45 @@
   "author": "Wunder.io",
   "private": true,
   "version": "1.0.0",
+  "engines": {
+    "node": ">=16.14"
+  },
   "scripts": {
     "prepare": "husky install",
     "build": "echo 'No build command specified in package.json'",
     "start": "node index",
-    "lint": "npm-run-all lint:*",
+    "lint": "npm run lint:es && npm run lint:style",
     "lint:es": "./node_modules/.bin/eslint ./",
-    "lint:style": "./node_modules/.bin/stylelint ./",
+    "lint:style": "./node_modules/.bin/stylelint ./**/*.{js,ts,css,scss,less}",
     "test": "jest --forceExit"
   },
   "dependencies": {
     "express": "^4.17.1"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.2.0",
-    "eslint-config-airbnb": "^18.1.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-import-resolver-webpack": "^0.12.1",
-    "eslint-plugin-import": "^2.21.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.3",
-    "eslint-plugin-react": "^7.20.0",
-    "eslint-plugin-react-hooks": "^4.0.4",
-    "eslint-plugin-sonarjs": "^0.5.0",
-    "husky": "^6.0.0",
-    "jest": "^26.6.1",
-    "lint-staged": "^11.0.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.5",
-    "stylelint": "^13.6.0",
-    "stylelint-config-recommended": "^3.0.0",
-    "supertest": "^5.0.0"
+    "@babel/eslint-parser": "^7.17.0",
+    "@stylelint/postcss-css-in-js": "^0.37.2",
+    "eslint": "^8.12.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-webpack": "^0.13.2",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.4.0",
+    "eslint-plugin-sonarjs": "^0.13.0",
+    "husky": "^7.0.4",
+    "jest": "^27.5.1",
+    "lint-staged": "^12.3.7",
+    "postcss-scss": "^4.0.3",
+    "prettier": "^2.6.1",
+    "stylelint": "^14.6.1",
+    "stylelint-config-recommended": "^7.0.0",
+    "supertest": "^6.2.2"
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "@babel/eslint-parser"
   }
 }

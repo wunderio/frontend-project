@@ -7,3 +7,25 @@ The express application in index.js is just there as an example, feel free to re
 - Your project's `package.json` should be in the repository root. 
 - Your `package.json` includes a `build` command used to build the codebase after the installation of npm packages.
 - Your `package.json` includes a `start` command used to start your application in the deployed environment.
+
+## NVM (Node Version Manager)
+
+It is recommended to use [NVM](https://github.com/nvm-sh/nvm) in order to switch on correct Node.js and npm versions with ease.
+
+On Linux and MacOS use:
+```shell
+nvm use
+```
+
+On Windows use:
+```shell
+nvm use $($Get-Content .nvmrc)
+```
+
+## Troubleshooting
+
+### On Windows
+
+- Linting probably wont work directly with command `npm run lint` do it via lint-staged with command `npx lint-staged`.
+Dont worry per-commit hooks will work fine.
+- In your code editor use LF all the time, otherwise there will be prettier errors when linting.
