@@ -38,7 +38,9 @@ workflows:
             - silta/npm-install-build
           filters:
             branches:
-              ignore: production
+              ignore:
+                - production
+                - /dependabot\/.*/
 
       - silta/frontend-build-deploy:
           # Extend the build-deploy configuration for the production environment.
@@ -49,3 +51,12 @@ workflows:
           filters:
             branches:
               only: production
+
+      - silta/frontend-build-deploy:
+          <<: *build-deploy
+          name: Build Dependabot
+          context: silta_dev
+          skip-deployment: true
+          filters:
+            branches:
+              only: /dependabot\/.*/
