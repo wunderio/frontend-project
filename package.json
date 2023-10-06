@@ -39,7 +39,7 @@
     "prettier": "^2.6.2",
     "stylelint": "^14.6.1",
     "stylelint-config-recommended": "^7.0.0",
-    "supertest": "^6.2.2"
+    "supertest": "^6.3.3"
   },
   "standard": {
     "parser": "@babel/eslint-parser"
