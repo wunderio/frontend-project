@@ -3,10 +3,16 @@ version: 2.1
 orbs:
   silta: silta/silta@1
 
+executors:
+  node22:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-test20240613
+
+
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:20.6.0-browsers
+      - image: cimg/node:22.2.0-browsers
 
     steps:
       - checkout
@@ -33,6 +39,7 @@ workflows:
       - build-and-test
       - silta/frontend-build-deploy: &build-deploy
           name: Silta build & deploy
+          executor: node22
           context: silta_dev
           codebase-build:
             - silta/npm-install-build
