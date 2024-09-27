@@ -45,12 +45,31 @@ workflows:
             - silta/npm-install-build
           filters:
             branches:
+              only:
+                - main
+
+      - approval:
+          type: approval
+          name: "Deployment approval"
+          filters:
+            branches:
               ignore:
                 - production
+                - main
                 - /dependabot\/.*/
 
       - silta/frontend-build-deploy:
-          # Extend the build-deploy configuration for the production environment.
+          <<: *build-deploy
+          requires:
+            - "Deployment approval"
+          filters:
+            branches:
+              ignore:
+                - production
+                - main
+                - /dependabot\/.*/
+
+      - silta/frontend-build-deploy:
           <<: *build-deploy
           name: Silta build & deploy production
           context: silta_finland
