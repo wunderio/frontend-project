@@ -6,7 +6,7 @@ orbs:
 executors:
   node22:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
+      - image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 
 jobs:
