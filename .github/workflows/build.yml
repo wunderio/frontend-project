@@ -1,0 +1,150 @@
+---
+name: Build & Push Images
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "k8s/**"
+      - "**.md"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ${{ vars.REGISTRY || 'registry.wdr.io' }}
+  REPO: ${{ github.event.repository.name }}
+
+jobs:
+  # ---------------------------------------------------------------
+  # Stage 1: Validate codebase (lint, tests).
+  # ---------------------------------------------------------------
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: npm ci
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint:es
+
+      - name: Stylelint
+        run: npm run lint:style
+
+      - name: Test
+        run: npm run test
+
+  # ---------------------------------------------------------------
+  # Stage 2: Build production assets.
+  # ---------------------------------------------------------------
+  build-assets:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: npm ci
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload built codebase
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-codebase
+          path: |
+            .
+            !.git
+            !node_modules
+          retention-days: 1
+
+  # ---------------------------------------------------------------
+  # Stage 3: Build and push Docker image.
+  # ---------------------------------------------------------------
+  build-image:
+    name: Build & Push — node
+    runs-on: ubuntu-latest
+    needs: build-assets
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download built codebase
+        uses: actions/download-artifact@v4
+        with:
+          name: built-codebase
+
+      - name: Set image tag
+        id: tag
+        shell: bash
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          SAFE=$(echo "$BRANCH" | tr '/' '-' | tr '_' '-' | cut -c1-40)
+          TIMESTAMP=$(date -u +%Y%m%dT%H%M%S)
+          echo "tag=${SAFE}-${TIMESTAMP}-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=${SAFE}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Harbor registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Ensure Harbor project exists
+        shell: bash
+        run: |
+          BODY=$(curl -s \
+            -u '${{ secrets.REGISTRY_USERNAME }}:${{ secrets.REGISTRY_PASSWORD }}' \
+            "https://${REGISTRY}/api/v2.0/projects?name=${REPO}")
+          if echo "$BODY" | grep -q '"project_id"'; then
+            echo "Project '${REPO}' already exists."
+          else
+            echo "Creating project '${REPO}'..."
+            curl -s -f -X POST \
+              -u '${{ secrets.REGISTRY_USERNAME }}:${{ secrets.REGISTRY_PASSWORD }}' \
+              -H "Content-Type: application/json" \
+              "https://${REGISTRY}/api/v2.0/projects" \
+              -d "{\"project_name\":\"${REPO}\",\"public\":false}" \
+              && echo "Project created." \
+              || echo "::warning::Failed to create project (may already exist or lack permissions)."
+          fi
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: silta/node.Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REPO }}/node:${{ steps.tag.outputs.tag }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.branch=${{ steps.tag.outputs.branch }}
+          cache-from: type=gha,scope=node
+          cache-to: type=gha,scope=node,mode=max
