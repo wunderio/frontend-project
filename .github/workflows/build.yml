@@ -140,6 +140,7 @@ jobs:
         with:
           context: .
           file: silta/node.Dockerfile
+          pull: true
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.REPO }}/node:${{ steps.tag.outputs.tag }}
           labels: |
