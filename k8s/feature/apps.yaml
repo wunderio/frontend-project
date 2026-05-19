@@ -1,0 +1,16 @@
+---
+# apps.yaml — ArgoCD application definitions for feature/PR environments.
+#
+# Branch mapping: feature/hotfix/epic/* PRs -> pr-<N>
+# (see cluster-management PR ApplicationSet).
+#
+# UPDATE: Change the namespace to match your project.
+
+namespace: client-fi-CHANGEME
+
+apps:
+  - name: frontend
+    chart: frontend
+    repoURL: https://storage.googleapis.com/charts.wdr.io
+    version: ">=1.0.0"
+    valuesFile: values/frontend.yaml

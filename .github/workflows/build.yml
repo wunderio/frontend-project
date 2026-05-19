@@ -100,3 +100,23 @@ jobs:
           registry: ${{ env.REGISTRY }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+
+  # ---------------------------------------------------------------
+  # Stage 4: Update image tags in ArgoCD values files.
+  # Queries the registry for the latest tags and commits the update.
+  # ---------------------------------------------------------------
+  update-tags:
+    name: Update Image Tags
+    runs-on: ubuntu-latest
+    needs: build-image
+    permissions:
+      contents: write
+    steps:
+      - name: Update image tags
+        uses: wunderio/silta-actions/update-image-tags@v1
+        with:
+          image-names: "node=services.node.image"
+          values-file: values/frontend.yaml
+          registry: ${{ env.REGISTRY }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}

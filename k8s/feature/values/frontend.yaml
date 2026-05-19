@@ -1,0 +1,12 @@
+---
+# Helm values for the frontend chart — feature/PR environments.
+#
+# UPDATE: Change image repository paths to match your Harbor project name.
+
+services:
+  node:
+    image:
+      repository: registry.wdr.io/CHANGEME/node
+      tag: placeholder-00000000T000000-0000000
+    exposedRoute: "/"
+    port: 3000

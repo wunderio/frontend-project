@@ -1,0 +1,21 @@
+---
+# Helm values for the frontend chart — staging environment.
+#
+# Image tags are updated by CI via wunderio/silta-actions/update-image-tags.
+# Tag format: {branch-normalized}-{timestamp}-{sha}
+# Example:    main-20260101T120000-abc1234
+#
+# These values are merged on top of:
+#   1. cluster-management base-values.yaml (cluster-wide defaults)
+#   2. This file (project + environment specifics)
+#
+# UPDATE: Change image repository paths to match your Harbor project name.
+
+services:
+  node:
+    image:
+      # UPDATE: Replace CHANGEME with your Harbor project name.
+      repository: registry.wdr.io/CHANGEME/node
+      tag: main-00000000T000000-0000000
+    exposedRoute: "/"
+    port: 3000
