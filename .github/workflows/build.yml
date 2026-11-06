@@ -1,0 +1,152 @@
+---
+# Builds the project's images, pushes them to Harbor and commits the new tags to
+# k8s/<overlay>/values/, which ArgoCD then deploys. See README.md, "ArgoCD deployment".
+name: Build & Push Images
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "k8s/**"
+      - "**.md"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Read-only default; only update-tags gets contents: write.
+permissions:
+  contents: read
+
+env:
+  # Must match the image repositories in k8s/*/values/, which ArgoCD pulls from.
+  REGISTRY: registry.wdr.io
+
+jobs:
+  # ---------------------------------------------------------------
+  # Validate codebase (lint, tests). Must pass before any build.
+  # ---------------------------------------------------------------
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint:es
+
+      - name: Stylelint
+        run: npm run lint:style
+
+      - name: Tests
+        run: npm test
+
+  # ---------------------------------------------------------------
+  # Install production dependencies and build assets.
+  # ---------------------------------------------------------------
+  build-assets:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # The image runs `npm run start` on the built codebase, so node_modules ships in it:
+      # build with all dependencies, then drop the development ones.
+      - name: npm install & build
+        run: |
+          npm ci
+          npm run build
+          npm prune --omit=dev
+
+      - name: Clean up before artifact upload
+        run: rm -rf .git
+
+      - name: Upload built codebase
+        uses: pyTooling/upload-artifact@v7
+        with:
+          name: built-codebase
+          include-hidden-files: true
+          path: .
+          retention-days: 1
+
+  # ---------------------------------------------------------------
+  # Build and push the node image.
+  # ---------------------------------------------------------------
+  build-image:
+    name: Build & Push — node
+    runs-on: ubuntu-latest
+    needs: build-assets
+    # Images only on push. A pull_request run would build the same commit a second time and
+    # race the push run's tag commit, and fork pull requests get no registry secrets; pull
+    # requests are validated only. update-tags commits with "[skip ci]", so it never retriggers.
+    # No images from the template repository itself (is_template), so it never deploys: a
+    # repository created from the template has is_template false and builds normally.
+    # Dependency update branches (Dependabot, Renovate) are validated but get no images either:
+    # they never deploy, and Dependabot runs without the registry secrets. Skipping this job
+    # also skips update-tags, which needs it.
+    if: >-
+      github.event_name == 'push' &&
+      !github.event.repository.is_template &&
+      !startsWith(github.head_ref || github.ref_name, 'dependabot/') &&
+      !startsWith(github.head_ref || github.ref_name, 'renovate/')
+    permissions:
+      contents: read
+    steps:
+      - name: Build & push image
+        uses: wunderio/argocd-silta-actions/build-push-image@v1
+        with:
+          artifact-name: built-codebase
+          image-name: node
+          dockerfile: silta/node.Dockerfile
+          registry: ${{ env.REGISTRY }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+
+  # ---------------------------------------------------------------
+  # Update image tags in the ArgoCD values file of the branch's overlay.
+  # Queries the registry for the latest tags and commits the update.
+  # ---------------------------------------------------------------
+  update-tags:
+    name: Update Image Tags
+    runs-on: ubuntu-latest
+    needs: build-image
+    permissions:
+      contents: write
+    steps:
+      # The ArgoCD GitHub App token lets the tag commit pass branch protection.
+      - name: Generate ArgoCD App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.ARGOCD_APP_ID }}
+          private-key: ${{ secrets.ARGOCD_APP_PRIVATE_KEY }}
+
+      - name: Update image tags
+        uses: wunderio/argocd-silta-actions/update-image-tags@v1
+        with:
+          image-names: "node=services.node.image"
+          values-file: values/frontend.yaml
+          registry: ${{ env.REGISTRY }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          token: ${{ steps.app-token.outputs.token }}
