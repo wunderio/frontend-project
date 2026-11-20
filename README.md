@@ -24,7 +24,7 @@ nvm use $($Get-Content .nvmrc)
 
 ## ArgoCD deployment
 
-Projects created from this template can deploy with ArgoCD instead of Silta's CircleCI jobs.
+Projects created from this template deploy with ArgoCD; there is no CircleCI deployment.
 The platform side lives in [wunderio/argocd-cluster-management](https://github.com/wunderio/argocd-cluster-management)
 (`templates/argocd/README.md` there).
 
@@ -61,8 +61,7 @@ image and tag jobs when the repository is a template.
    grep -rl PROJECT_NAME k8s | xargs perl -pi -e "s/PROJECT_NAME/$name/g"
    ```
 
-3. Remove the Silta deploy jobs from `.circleci/config.yml` so the project doesn't deploy twice.
-4. Add the `silta-argocd` topic to the repository (repository page → About → Topics). New
+3. Add the `silta-argocd` topic to the repository (repository page → About → Topics). New
    repositories don't inherit the template's topics.
 
 The build workflow uses the organisation's `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`,
