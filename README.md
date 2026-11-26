@@ -34,7 +34,8 @@ values in `k8s/<overlay>/values/`, and adds the cluster's defaults (domain, TLS,
   environment only while it carries the `preview` label (create the label in the repository if
   it does not exist yet). Removing the label or closing the pull request deletes the environment.
 - `.github/workflows/build.yml` builds the images on each push to a branch with an overlay
-  here, pushes them to `<registry>/<project>/` and commits the new tags to
+  here with [wunderio/argocd-actions](https://github.com/wunderio/argocd-actions), pushes them
+  to `<registry>/<project>/` and commits the new tags to
   `k8s/<overlay>/values/frontend.yaml`. ArgoCD deploys that commit. Other branches and pull
   requests are validated only.
 
@@ -59,7 +60,7 @@ the repository is a template.
 2. Replace the placeholders. Your platform team has the values:
    - `PROJECT_NAME`: the repository name in lowercase. It is the Kubernetes namespace and the
      project in the container registry.
-   - `REGISTRY_HOST`: the container registry the clusters pull images from.
+   - `REGISTRY_HOST`: the [Harbor](https://goharbor.io/) registry the clusters pull images from.
    - `AGE_RECIPIENT`: the platform's age public key for the project's secrets.
 
    ```bash
@@ -72,7 +73,8 @@ the repository is a template.
 
 The build workflow needs these repository or organisation secrets:
 
-- `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`: push access to the registry.
+- `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`: a registry account that can push, pull and list the
+  project's images, and create the project on the first build.
 - `ARGOCD_APP_ID`, `ARGOCD_APP_PRIVATE_KEY`: a GitHub App allowed to push to the deployed
   branches, so the tag commit passes branch protection.
 
