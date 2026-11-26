@@ -1,9 +1,0 @@
-# Values in this file override the default values of our helm chart.
-#
-# See https://github.com/wunderio/charts/blob/master/frontend/values.yaml
-# for all possible options.
-
-services:
-  node:
-    exposedRoute: '/'
-    port: 3000

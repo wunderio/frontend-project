@@ -1,0 +1,15 @@
+---
+# Values of the frontend chart for the staging overlay. Platform and cluster defaults (domain,
+# TLS, storage) come from the ArgoCD platform and apply before this file.
+# Chart options: https://github.com/wunderio/charts/blob/master/frontend/values.yaml
+#
+# CI (.github/workflows/build.yml, update-tags) sets the image tags after each
+# build; the placeholder tags below are replaced on the branch's first build.
+
+services:
+  node:
+    image:
+      repository: REGISTRY_HOST/PROJECT_NAME/node
+      tag: main-00000000T000000-0000000
+    exposedRoute: "/"
+    port: 3000
